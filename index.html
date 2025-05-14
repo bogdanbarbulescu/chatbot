@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Dark Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        
+        .chat-container {
+            width: 400px;
+            height: 600px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            background-color: #1e1e1e;
+        }
+        
+        .chat-header {
+            background-color: #2d2d6c;
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #333333;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #1e1e1e;
+            scrollbar-width: thin;
+            scrollbar-color: #555 #1e1e1e;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 10px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background-color: #4a5cab;
+            color: #ffffff;
+            margin-left: auto;
+            border-radius: 18px 18px 0 18px;
+        }
+        
+        .bot-message {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            margin-right: auto;
+            border-radius: 18px 18px 18px 0;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border-top: 1px solid #333333;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #444444;
+            border-radius: 20px;
+            outline: none;
+            background-color: #3a3a3a;
+            color: #e0e0e0;
+        }
+        
+        .chat-input input::placeholder {
+            color: #999999;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #5c63e0;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .chat-input button:hover {
+            background-color: #4a4fcf;
+        }
+        
+        .typing-indicator {
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .typing-indicator span {
+            height: 10px;
+            width: 10px;
+            float: left;
+            margin: 0 1px;
+            background-color: #a0a0a0;
+            display: block;
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+        
+        .typing-indicator span:nth-of-type(1) {
+            animation: 1s blink infinite 0.3333s;
+        }
+        
+        .typing-indicator span:nth-of-type(2) {
+            animation: 1s blink infinite 0.6666s;
+        }
+        
+        .typing-indicator span:nth-of-type(3) {
+            animation: 1s blink infinite 0.9999s;
+        }
+        
+        @keyframes blink {
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Chatbot Assistant
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                Salut! Sunt chatbot-ul tău. Cu ce te pot ajuta astăzi?
+            </div>
+            <div class="typing-indicator bot-message" id="typingIndicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Scrie un mesaj..." autocomplete="off">
+            <button id="sendButton">Trimite</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chatMessages');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            // Răspunsurile predefinite ale chatbot-ului
+            const botResponses = {
+                'salut': 'Salut! Cu ce te pot ajuta astăzi?',
+                'buna': 'Bună ziua! Cum te pot ajuta?',
+                'cine esti': 'Sunt un chatbot cu temă întunecată creat cu HTML, CSS și JavaScript!',
+                'ce faci': 'Sunt aici pentru a conversa cu tine și a răspunde întrebărilor tale!',
+                'multumesc': 'Cu plăcere! Mai pot să te ajut cu ceva?',
+                'ajutor': 'Desigur! Poți să îmi pui întrebări simple și voi încerca să te ajut.',
+                'la revedere': 'La revedere! Sper să te văd curând!',
+                'pa': 'Pa! O zi frumoasă în continuare!',
+                'ce poti face': 'Pot să conversez și să răspund la întrebări simple. Sunt încă în dezvoltare, deci capacitățile mele sunt limitate.',
+                'dark': 'Da, folosesc un design dark theme pentru confort vizual!'
+            };
+            
+            // Functie pentru a adăuga un mesaj în chat
+            function addMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(isUser ? 'user-message' : 'bot-message');
+                messageDiv.textContent = text;
+                
+                chatMessages.insertBefore(messageDiv, typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Functie pentru a simula răspunsul chatbot-ului
+            function botReply(userText) {
+                typingIndicator.style.display = 'block';
+                
+                setTimeout(() => {
+                    typingIndicator.style.display = 'none';
+                    
+                    // Verificăm dacă avem un răspuns predefinit pentru mesajul utilizatorului
+                    const userTextLower = userText.toLowerCase();
+                    let botResponse = 'Îmi pare rău, nu înțeleg. Poți să reformulezi?';
+                    
+                    for (const [key, value] of Object.entries(botResponses)) {
+                        if (userTextLower.includes(key)) {
+                            botResponse = value;
+                            break;
+                        }
+                    }
+                    
+                    addMessage(botResponse);
+                }, 1000);
+            }
+            
+            // Event listener pentru butonul de trimitere
+            sendButton.addEventListener('click', sendMessage);
+            
+            // Event listener pentru tasta Enter
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            function sendMessage() {
+                const text = userInput.value.trim();
+                if (text !== '') {
+                    addMessage(text, true);
+                    userInput.value = '';
+                    botReply(text);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
